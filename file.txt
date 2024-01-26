@@ -1,0 +1,28 @@
+import os
+
+def obtener_nombres_archivos(ruta_carpeta):
+    try:
+        # Lista de archivos en la carpeta
+        archivos = os.listdir(ruta_carpeta)
+        
+        # Imprime los nombres de los archivos
+        for archivo in archivos:
+            print(archivo)
+        
+        # Asigna los nombres de los archivos a una variable
+        nombres_archivos = archivos
+        
+        return nombres_archivos
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+# Ejemplo de uso
+ruta_carpeta_ejemplo = "/ruta/a/tu/carpeta"
+nombres_archivos_resultado = obtener_nombres_archivos(ruta_carpeta_ejemplo)
+
+if nombres_archivos_resultado:
+    print("Nombres de archivos:", nombres_archivos_resultado)
+else:
+    print("No se pudieron obtener los nombres de archivos.")
