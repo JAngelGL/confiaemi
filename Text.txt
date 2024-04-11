@@ -7,54 +7,58 @@ class Program
     {
         try
         {
-            Session theSession = Session.GetSession();
-            Part workPart = theSession.Parts.Work;
-
-
-
-            // Crear un nuevo boceto en el plano XY
-            string sketchName = "Rectángulo";
-            Point3d sketchOrigin = new Point3d(0.0, 0.0, 0.0); // Origen del boceto
-            Vector3d sketchXDirection = new Vector3d(1.0, 0.0, 0.0); // Dirección X del boceto
-            Vector3d sketchYDirection = new Vector3d(0.0, 1.0, 0.0); // Dirección Y del boceto
-            Plane sketchPlane = workPart.Planes.CreatePlane(sketchOrigin, sketchXDirection, sketchYDirection, SmartObject.UpdateOption.WithinModeling);
-            Sketch sketch = workPart.Sketches.CreateSketch(sketchName, sketchPlane, true);
-
-            // Iniciar el boceto
-            sketch.OpenSketch();
-
-            // Definir las coordenadas del rectángulo
-            Point3d point1 = new Point3d(0.0, 0.0, 0.0);
-            Point3d point2 = new Point3d(100.0, 0.0, 0.0); // 100 en X
-            Point3d point3 = new Point3d(100.0, 50.0, 0.0); // 100 en X y 50 en Y
-            Point3d point4 = new Point3d(0.0, 50.0, 0.0); // 50 en Y
-
-            // Crear líneas para formar el rectángulo
-            workPart.Curves.CreateLine(point1, point2);
-            workPart.Curves.CreateLine(point2, point3);
-            workPart.Curves.CreateLine(point3, point4);
-            workPart.Curves.CreateLine(point4, point1);
-
-            // Cerrar el boceto
-            sketch.CloseSketch();
+            ExecuteSession();
         }
         catch (Exception ex)
         {
-            // Manejar excepciones aquí
             Console.WriteLine("Error: " + ex.Message);
         }
     }
 
-    // NXOpen requiere que declaremos estos dos métodos en la clase
-    public static int GetUnloadOption(string arg)
+    public static void ExecuteSession()
     {
-        // Unload the image immediately after execution within NX
-        return (int)Session.LibraryUnloadOption.Immediately;
+        Session theSession = Session.GetSession();
+        Part workPart = theSession.Parts.Work;
+
+        if (workPart != null)
+        {
+            string sketchName = "Rectángulo";
+            Point3d sketchOrigin = new Point3d(0.0, 0.0, 0.0);
+            Vector3d sketchXDirection = new Vector3d(1.0, 0.0, 0.0);
+            Vector3d sketchYDirection = new Vector3d(0.0, 1.0, 0.0);
+
+            if (Vector3d.ArePerpendicular(sketchXDirection, sketchYDirection))
+            {
+                Plane sketchPlane = workPart.Planes.CreatePlane(sketchOrigin, sketchXDirection, sketchYDirection, SmartObject.UpdateOption.WithinModeling);
+                Sketch sketch = workPart.Sketches.CreateSketch(sketchName, sketchPlane, true);
+
+                sketch.OpenSketch();
+                
+                Point3d point1 = new Point3d(0.0, 0.0, 0.0);
+                Point3d point2 = new Point3d(100.0, 0.0, 0.0);
+                Point3d point3 = new Point3d(100.0, 50.0, 0.0);
+                Point3d point4 = new Point3d(0.0, 50.0, 0.0);
+
+                workPart.Curves.CreateLine(point1, point2);
+                workPart.Curves.CreateLine(point2, point3);
+                workPart.Curves.CreateLine(point3, point4);
+                workPart.Curves.CreateLine(point4, point1);
+
+                sketch.CloseSketch();
+            }
+            else
+            {
+                Console.WriteLine("Los vectores no son ortogonales.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("No hay una parte de trabajo activa.");
+        }
     }
 
-    public static int Main(string[] args)
+    public static int GetUnloadOption(string arg)
     {
-        Main(args);
-        return 0;
+        return (int)Session.LibraryUnloadOption.Immediately;
     }
 }
