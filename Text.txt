@@ -1,37 +1,60 @@
-import NXOpen
-import NXOpen.Features
-import NXOpen.GeometricUtilities
+using NXOpen;
+using System;
 
-def create_rectangle():
-    # Obtener la sesión de NX y el trabajo en curso
-    theSession = NXOpen.Session.GetSession()
-    workPart = theSession.Parts.Work
-    
-    # Crear un nuevo boceto en el plano XY
-    sketchName = "Rectángulo"
-    sketchOrigin = NXOpen.Point3d(0.0, 0.0, 0.0) # Origen del boceto
-    sketchXDirection = NXOpen.Vector3d(1.0, 0.0, 0.0) # Dirección X del boceto
-    sketchYDirection = NXOpen.Vector3d(0.0, 1.0, 0.0) # Dirección Y del boceto
-    sketchPlane = workPart.Planes.CreatePlane(sketchOrigin, sketchXDirection, sketchYDirection, NXOpen.SmartObject.UpdateOption.WithinModeling)
-    sketch = workPart.Sketches.CreateSketch(sketchName, sketchPlane, True)
+class Program
+{
+    public static void Main(string[] args)
+    {
+        try
+        {
+            Session theSession = Session.GetSession();
+            Part workPart = theSession.Parts.Work;
 
-    # Iniciar el boceto
-    sketch.OpenSketch()
 
-    # Definir las coordenadas del rectángulo
-    point1 = NXOpen.Point3d(0.0, 0.0, 0.0)
-    point2 = NXOpen.Point3d(100.0, 0.0, 0.0) # 100 en X
-    point3 = NXOpen.Point3d(100.0, 50.0, 0.0) # 100 en X y 50 en Y
-    point4 = NXOpen.Point3d(0.0, 50.0, 0.0) # 50 en Y
 
-    # Crear líneas para formar el rectángulo
-    line1 = workPart.Curves.CreateLine(point1, point2)
-    line2 = workPart.Curves.CreateLine(point2, point3)
-    line3 = workPart.Curves.CreateLine(point3, point4)
-    line4 = workPart.Curves.CreateLine(point4, point1)
+            // Crear un nuevo boceto en el plano XY
+            string sketchName = "Rectángulo";
+            Point3d sketchOrigin = new Point3d(0.0, 0.0, 0.0); // Origen del boceto
+            Vector3d sketchXDirection = new Vector3d(1.0, 0.0, 0.0); // Dirección X del boceto
+            Vector3d sketchYDirection = new Vector3d(0.0, 1.0, 0.0); // Dirección Y del boceto
+            Plane sketchPlane = workPart.Planes.CreatePlane(sketchOrigin, sketchXDirection, sketchYDirection, SmartObject.UpdateOption.WithinModeling);
+            Sketch sketch = workPart.Sketches.CreateSketch(sketchName, sketchPlane, true);
 
-    # Cerrar el boceto
-    sketch.CloseSketch()
+            // Iniciar el boceto
+            sketch.OpenSketch();
 
-if __name__ == '__main__':
-    create_rectangle()
+            // Definir las coordenadas del rectángulo
+            Point3d point1 = new Point3d(0.0, 0.0, 0.0);
+            Point3d point2 = new Point3d(100.0, 0.0, 0.0); // 100 en X
+            Point3d point3 = new Point3d(100.0, 50.0, 0.0); // 100 en X y 50 en Y
+            Point3d point4 = new Point3d(0.0, 50.0, 0.0); // 50 en Y
+
+            // Crear líneas para formar el rectángulo
+            workPart.Curves.CreateLine(point1, point2);
+            workPart.Curves.CreateLine(point2, point3);
+            workPart.Curves.CreateLine(point3, point4);
+            workPart.Curves.CreateLine(point4, point1);
+
+            // Cerrar el boceto
+            sketch.CloseSketch();
+        }
+        catch (Exception ex)
+        {
+            // Manejar excepciones aquí
+            Console.WriteLine("Error: " + ex.Message);
+        }
+    }
+
+    // NXOpen requiere que declaremos estos dos métodos en la clase
+    public static int GetUnloadOption(string arg)
+    {
+        // Unload the image immediately after execution within NX
+        return (int)Session.LibraryUnloadOption.Immediately;
+    }
+
+    public static int Main(string[] args)
+    {
+        Main(args);
+        return 0;
+    }
+}
