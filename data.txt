@@ -1,0 +1,66 @@
+using NXOpen;
+using System;
+
+public class Program
+{
+    public static void Main()
+    {
+        Session theSession = Session.GetSession();
+        Part workPart = theSession.Parts.Work;
+
+        // Open the listing window
+        theSession.ListingWindow.Open();
+
+        try
+        {
+            // Get user to select an object
+            NXObject selectedObject = GetUserSelectedObject();
+
+            if (selectedObject != null)
+            {
+                // Print details about the selected object
+                theSession.ListingWindow.WriteLine("Selected Object Details:");
+                theSession.ListingWindow.WriteLine("Type: " + selectedObject.GetType().ToString());
+                theSession.ListingWindow.WriteLine("Name: " + selectedObject.Name);
+                theSession.ListingWindow.WriteLine("Tag: " + selectedObject.Tag.ToString());
+                
+                // Additional properties can be printed depending on the type of the object
+                // Example for a body:
+                if (selectedObject is Body body)
+                {
+                    theSession.ListingWindow.WriteLine("Number of Faces: " + body.GetFaces().Length);
+                }
+            }
+            else
+            {
+                theSession.ListingWindow.WriteLine("No object selected.");
+            }
+        }
+        catch (Exception ex)
+        {
+            theSession.ListingWindow.WriteLine("Error: " + ex.Message);
+        }
+    }
+
+    private static NXObject GetUserSelectedObject()
+    {
+        Session theSession = Session.GetSession();
+        UI theUI = UI.GetUI();
+
+        NXOpen.Selection.SelectionScope scope = NXOpen.Selection.SelectionScope.WorkPart;
+        NXOpen.Selection.SelectionAction action = NXOpen.Selection.SelectionAction.ClearAndEnableSpecific;
+        NXOpen.Selection.MaskTriple[] mask = new NXOpen.Selection.MaskTriple[1] {
+            new NXOpen.Selection.MaskTriple(NXOpen.UF.UFConstants.UF_solid_body_type, 0, 0)
+        };
+
+        theUI.SelectionManager.SelectObject("Select an object", "Select object", scope, action, false, false, mask, out NXObject selectedObject, out NXOpen.View view);
+        
+        return selectedObject;
+    }
+
+    public static int GetUnloadOption(string arg)
+    {
+        // Specify how the .dll should be unloaded after execution
+        return (int)Session.LibraryUnloadOption.Immediately;
+    }
+}
