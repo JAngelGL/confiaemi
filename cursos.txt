@@ -1,0 +1,53 @@
+using NXOpen;
+using NXOpen.Features;
+using NXOpen.UF;
+
+public class Program
+{
+    public static void Main()
+    {
+        Session theSession = Session.GetSession();
+        Part workPart = theSession.Parts.Work;
+        UFSession ufSession = UFSession.GetUFSession();
+        
+        // Open the listing window and print "Hello, World!"
+        theSession.ListingWindow.Open();
+        theSession.ListingWindow.WriteLine("Hello, World!");
+
+        // Get user to select a point where the block will be created
+        Point3d origin = GetUserPoint();
+        
+        // Create a block feature builder
+        BlockFeatureBuilder blockBuilder = workPart.Features.CreateBlockFeatureBuilder(null);
+        
+        // Set origin and dimensions of the block
+        blockBuilder.SetOriginAndLengths(origin, "3.0", "3.0", "3.0");
+        
+        // Commit the block feature
+        blockBuilder.Commit();
+        
+        // Clean up
+        blockBuilder.Destroy();
+        
+        // Fit the view to display new geometry
+        workPart.ModelingViews.WorkView.Fit();
+    }
+    
+    private static Point3d GetUserPoint()
+    {
+        UI theUI = UI.GetUI();
+        Selection.Response response;
+        Point3d coordinates = new Point3d();
+        
+        // Prompt user to select a point
+        theUI.SelectionManager.SelectScreenPosition("Select a point for the block origin", out response, out coordinates);
+        
+        return coordinates;
+    }
+
+    public static int GetUnloadOption(string arg)
+    {
+        // Specify how the .dll should be unloaded after execution
+        return (int)Session.LibraryUnloadOption.Immediately;
+    }
+}
