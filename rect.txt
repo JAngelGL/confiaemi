@@ -1,0 +1,40 @@
+using NXOpen;
+using NXOpen.Features;
+using NXOpen.GeometricUtilities;
+
+public class Program
+{
+    public static void Main()
+    {
+        Session theSession = Session.GetSession();
+        Part workPart = theSession.Parts.Work;
+        
+        // Message output
+        theSession.ListingWindow.Open();
+        theSession.ListingWindow.WriteLine("Hello, World!");
+
+        // Define the base point for the block
+        Point3d origin = new Point3d(0.0, 0.0, 0.0);
+        
+        // Dimensions for the block: 3 cm x 3 cm x 3 cm
+        double length = 3.0;
+        double width = 3.0;
+        double height = 3.0;
+        
+        // Create a block feature
+        BlockFeature blockFeature = workPart.Features.CreateBlock(BaseFeature.PrecedenceType.PrecedenceNone,
+                                                                  origin, new Point3d(length, width, height));
+        // Commit the feature to the part
+        NXObject.NXObjectAttribute[] attributes = new NXObject.NXObjectAttribute[0];
+        blockFeature.CommitAttributes(attributes);
+        
+        // Optionally, fit the view to see the block
+        workPart.ModelingViews.WorkView.Fit();
+    }
+    
+    public static int GetUnloadOption(string arg)
+    {
+        // Unload the image immediately after execution within NX
+        return (int)Session.LibraryUnloadOption.Immediately;
+    }
+}
