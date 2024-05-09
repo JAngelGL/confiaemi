@@ -1,27 +1,33 @@
-import NXOpen
-import NXOpen.UF
+using NXOpen;
+using NXOpen.UF;
 
-def obtener_posicion_cara(face_select0):
-    theSession = NXOpen.Session.GetSession()
-    workPart = theSession.Parts.Work
+public class FacePositionFinder
+{
+    public static void Main()
+    {
+        Session theSession = Session.GetSession();
+        Part workPart = theSession.Parts.Work;
 
-    # Asumiendo que face_select0 ya tiene las caras recogidas
-    faces = face_select0.GetEntities()
-    
-    for face in faces:
-        # Usamos UFSession para acceder a funciones de bajo nivel
-        ufSession = NXOpen.UF.UFSession.GetUFSession()
-        
-        # Obtener el tipo y los datos del cuerpo de la cara
-        face_tag = face.Tag
-        face_type, body_tag = ufSession.Modeling.AskFaceTypeAndBody(face_tag)
-        
-        # Calcular el centroide de la cara
-        centroid = NXOpen.Point3d()
-        area, centroid = ufSession.Modl.AskFaceArea(face_tag, centroid)
-        
-        # Imprimir la posición del centroide de la cara
-        print("Centroide de la cara:", centroid)
+        // Asumiendo que tienes una referencia a un FaceCollector llamado faceCollector
+        FaceCollector faceCollector; // Asegúrate de inicializar este objeto correctamente
 
-# Asegúrate de llamar a la función con el FaceCollector adecuado
-# obtener_posicion_cara(face_select0)
+        // Obtener las caras del FaceCollector
+        NXObject[] faces = faceCollector.GetEntities();
+
+        foreach (Face face in faces)
+        {
+            UFSession ufSession = UFSession.GetUFSession();
+            
+            // Obtener el tag de la cara y calcular el centroide
+            Tag faceTag = face.Tag;
+            double area, centroidX, centroidY, centroidZ;
+            ufSession.Modl.AskFaceArea(faceTag, out area, out centroidX, out centroidY, out centroidZ);
+
+            // Imprimir la posición del centroide de la cara
+            System.Console.WriteLine($"Centroide de la cara: ({centroidX}, {centroidY}, {centroidZ})");
+        }
+    }
+
+    // Método necesario para que NXOpen pueda ejecutar este programa
+    public static int GetUnloadOption(string dummy) => (int)Session.LibraryUnloadOption.Immediately;
+}
