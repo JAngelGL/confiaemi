@@ -1,0 +1,39 @@
+using NXOpen;
+using NXOpen.UF;
+using System;
+
+public class Example
+{
+    public static void Main()
+    {
+        // Inicializar la sesión
+        Session theSession = Session.GetSession();
+        UFSession theUFSession = UFSession.GetUFSession();
+
+        // Obtener la pieza activa
+        Part workPart = theSession.Parts.Work;
+        
+        if (workPart != null)
+        {
+            // Obtener todos los sistemas de coordenadas en la pieza
+            CoordinateSystemCollection coordSystems = workPart.CoordinateSystems;
+            foreach (CoordinateSystem csys in coordSystems)
+            {
+                // Obtener la información de cada sistema de coordenadas
+                Point3d origin = csys.Origin;
+                Matrix3x3 orientation = csys.Orientation;
+                
+                Console.WriteLine($"Sistema de Coordenadas: {csys.Name}");
+                Console.WriteLine($"Origen: ({origin.X}, {origin.Y}, {origin.Z})");
+                Console.WriteLine("Orientación:");
+                Console.WriteLine($"X: ({orientation.Xx}, {orientation.Xy}, {orientation.Xz})");
+                Console.WriteLine($"Y: ({orientation.Yx}, {orientation.Yy}, {orientation.Yz})");
+                Console.WriteLine($"Z: ({orientation.Zx}, {orientation.Zy}, {orientation.Zz})");
+            }
+        }
+        else
+        {
+            Console.WriteLine("No hay una pieza activa.");
+        }
+    }
+}
