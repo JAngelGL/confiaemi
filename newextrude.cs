@@ -1,8 +1,3 @@
-using NXOpen;
-using NXOpen.Features;
-using NXOpen.GeometricUtilities;
-using NXOpen.UF;
-
 public static void CreatePrismAtPoint(Part workPart, Point3d baseCornerPoint)
 {
     // Define the dimensions of the prism
@@ -36,7 +31,7 @@ public static void CreatePrismAtPoint(Part workPart, Point3d baseCornerPoint)
     workPart.Sketches.Deactivate(sketch);
 
     // Create an extrusion feature
-    Features.ExtrudeBuilder extrudeBuilder = workPart.Features.CreateExtrudeBuilder(null);
+    NXOpen.Features.ExtrudeBuilder extrudeBuilder = workPart.Features.CreateExtrudeBuilder(null);
     extrudeBuilder.Section = workPart.Sections.CreateSection(0.01, 0.01, 0.5);
     extrudeBuilder.Section.AddCurve(line1, null, null);
     extrudeBuilder.Section.AddCurve(line2, null, null);
@@ -45,9 +40,9 @@ public static void CreatePrismAtPoint(Part workPart, Point3d baseCornerPoint)
     extrudeBuilder.Direction = workPart.Directions.CreateDirection(new Point3d(0.0, 0.0, 0.0), new Vector3d(0.0, 0.0, 1.0), SmartObject.UpdateOption.WithinModeling);
     extrudeBuilder.Limits.StartExtend.Value = 0.0;
     extrudeBuilder.Limits.EndExtend.Value = height;
-    extrudeBuilder.BooleanOperation.Type = GeometricUtilities.BooleanOperation.BooleanType.Create;
+    extrudeBuilder.BooleanOperation.Type = NXOpen.GeometricUtilities.BooleanOperation.BooleanType.Create;
 
     // Commit the extrusion feature
-    Features.Feature extrudeFeature = extrudeBuilder.CommitFeature();
+    NXOpen.Features.Feature extrudeFeature = extrudeBuilder.CommitFeature();
     extrudeBuilder.Destroy();
 }
