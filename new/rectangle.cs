@@ -1,19 +1,17 @@
 using NXOpen;
 using NXOpen.Features;
 using NXOpen.GeometricUtilities;
-using NXOpen.Sketch;
 using NXOpen.UF;
+using NXOpen.Utilities;
 
 public class RectangleCreator
 {
     public static void CreateRectangle(Session theSession, Part workPart, Point3d basePoint)
     {
         // Crear el sketch
-        DatumPlane datumPlane = workPart.Datums.CreateFixedDatumPlane(basePoint, Vector3d.ZAxis, 0.0);
         SketchInPlaceBuilder2 sketchBuilder = workPart.Sketches.CreateSketchInPlaceBuilder2(null);
-        sketchBuilder.Plane = datumPlane;
-        sketchBuilder.Origin = workPart.Points.CreatePoint(basePoint);
-        sketchBuilder.PlaneReferenceType = Sketch.PlaneReferenceType.WorkPartAbsolute;
+        sketchBuilder.OriginPoint = workPart.Points.CreatePoint(basePoint);
+        sketchBuilder.PlaneOption = Sketch.PlaneOption.InferFromGeometry;
 
         Sketch sketch = (Sketch)sketchBuilder.Commit();
         sketchBuilder.Destroy();
@@ -31,7 +29,13 @@ public class RectangleCreator
         Line line4 = workPart.Curves.CreateLine(point4, point1);
 
         // Añadir las líneas al sketch
-        sketch.AddGeometry(new Curve[] { line1, line2, line3, line4 }, Sketch.InferConstraintsOption.InferConstraints);
+        sketch.AddGeometry(new Curve[] { line1, line2, line3, line4 });
+
+        // Aplicar restricciones geométricas (opcional)
+        sketch.CreateCornerConstraints();
+        sketch.CreateCoincidentConstraints();
+        sketch.CreateHorizontalConstraints();
+        sketch.CreateVerticalConstraints();
 
         // Finalizar el sketch
         sketch.Update();
