@@ -1,0 +1,46 @@
+using System;
+using NXOpen;
+using NXOpen.UF;
+
+public class NXOpenScript
+{
+    public static void Main()
+    {
+        // Inicializar la sesión de NX
+        Session theSession = Session.GetSession();
+        Part workPart = theSession.Parts.Work;
+
+        // Inicializar la interfaz de funciones de NXOpen
+        UFSession theUFSession = UFSession.GetUFSession();
+
+        // Buscar todos los cuerpos en el workPart
+        Body[] bodies = workPart.Bodies.ToArray();
+
+        // Iterar sobre los cuerpos para encontrar el body de tipo sólido
+        foreach (Body body in bodies)
+        {
+            if (body.SolidBodyType == Body.CollectionType.SolidBody)
+            {
+                // Obtener el nombre del body
+                string bodyName = body.JournalIdentifier;
+
+                // Obtener la caja delimitadora utilizando UFSession
+                double[] boundingBox = new double[6];
+                theUFSession.Modl.AskBoundingBox(body.Tag, boundingBox);
+
+                // Imprimir la información
+                Console.WriteLine("Body Name: " + bodyName);
+                Console.WriteLine("Bounding Box Min: (" + boundingBox[0] + ", " + boundingBox[1] + ", " + boundingBox[2] + ")");
+                Console.WriteLine("Bounding Box Max: (" + boundingBox[3] + ", " + boundingBox[4] + ", " + boundingBox[5] + ")");
+
+                // Si necesitas más información, puedes obtenerla aquí
+
+                // Para este ejemplo, rompemos el bucle después de encontrar el primer body de tipo sólido
+                break;
+            }
+        }
+
+        // Finalizar la sesión de NX
+        theSession.Dispose();
+    }
+}
