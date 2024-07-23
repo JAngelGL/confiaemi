@@ -19,4 +19,22 @@ class Program
         string[] partes = cadena.Split(' ');
         return partes[^1];
     }
+
+    static string ObtenerUltimaParte(string cadena)
+    {
+        if (string.IsNullOrWhiteSpace(cadena))
+        {
+            return string.Empty;
+        }
+        
+        string[] partes = cadena.Split(' ');
+        string ultimaParte = partes[partes.Length - 1];
+        
+        if (ultimaParte.Length > 1 && ultimaParte.EndsWith(")"))
+        {
+            ultimaParte = ultimaParte.Substring(0, ultimaParte.Length - 1);
+        }
+
+        return ultimaParte;
+    }
 }
